@@ -11,6 +11,7 @@ const pool = mysql
   })
   .promise();
 
+// * GET FUNCTIONS
 export async function getPatients() {
   const [rows] = await pool.query(`
     SELECT * FROM patient
@@ -29,6 +30,27 @@ export async function getPatient(patientID) {
 
   return rows[0];
 }
+
+export async function getDoctors() {
+  const [rows] = await pool.query(`
+    SELECT * FROM doctor
+  `);
+  return rows;
+}
+
+export async function getDoctor(doctorID) {
+  const [rows] = await pool.query(
+    `
+    SELECT * FROM doctor
+    WHERE doctorID = ?
+  `,
+    [doctorID]
+  );
+
+  return rows[0];
+}
+
+// * CREATE FUNCTIONS
 
 export async function createPatient(
   firstName,
@@ -106,12 +128,7 @@ export async function createAdmission(patientID, complaints, medications) {
   );
 }
 
-export async function getDoctors() {
-  const [rows] = await pool.query("SELECT * FROM doctor");
-  return rows;
-}
-
-export async function insertDoctors(
+export async function createDoctor(
   doctorName,
   doctorStartTime,
   doctorEndTime,
@@ -121,7 +138,7 @@ export async function insertDoctors(
     `
     INSERT INTO doctor (doctorName, doctorStartTime, doctorEndTime, doctorPassword)
     VALUES (?, ?, ?, ?)
-    `,
+  `,
     [doctorName, doctorStartTime, doctorEndTime, doctorPassword]
   );
 }

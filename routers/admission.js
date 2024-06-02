@@ -30,7 +30,6 @@ admissionRouter.post("/new", async (req, res) => {
     } = req.body;
 
     const hashPassword = await bcrypt.hash(password, 13);
-    console.log("went here");
 
     const patient = await createPatient(
       firstName,
@@ -53,11 +52,13 @@ admissionRouter.post("/new", async (req, res) => {
       hashPassword
     );
 
+    console.log(patient);
+
     await createAdmission(patient.patientID, complaints, medications);
     res.send(patient);
   } catch (err) {
     console.error("Error creating new patient admission", err);
-    res.status(500).json("Failed to create new patient admission");
+    res.status(500).send("Failed to create new patient admission");
   }
 });
 
