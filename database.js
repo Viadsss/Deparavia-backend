@@ -30,7 +30,7 @@ export async function getDoctor(doctorID) {
   const [rows] = await pool.query(
     `
     SELECT * FROM doctor
-    WHERE doctorID = ?
+    WHERE BINARY doctorID = ?
   `,
     [doctorID]
   );
@@ -49,12 +49,27 @@ export async function getPatient(patientID) {
   const [rows] = await pool.query(
     `
     SELECT * FROM patient
-    WHERE patientID = ?
+    WHERE BINARY patientID = ?
   `,
     [patientID]
   );
 
   return rows[0];
+}
+
+export async function getPatientsOfDoctor(doctorID) {
+  const [rows] = await pool.query(
+    `
+    SELECT admissionID, patient.patientID, CONCAT(patient.firstName, ' ', patient.lastName, ' ', patient.middleName) AS fullName, patient.sex, patient.height, patient.weight, admission.complaints, admission.medications, admission.procedure, admission.diagnosis
+    FROM patient
+    INNER JOIN admission
+    ON patient.patientID = admission.patientID
+    WHERE admission.doctorID = ?
+    AND admission.dischargeDate IS NULL
+  `,
+    [doctorID]
+  );
+  return rows;
 }
 
 // * CREATE FUNCTIONS
@@ -174,6 +189,50 @@ export async function updateDoctorShift(
     WHERE doctorID = ? 
   `,
     [doctorStartTime, doctorEndtime, doctorID]
+  );
+}
+
+export async function updateDoctorPassword(doctorID, newPassword) {
+  await pool.query(
+    `
+    UPDATE doctor
+    SET doctorPassword = ?
+    WHERE doctorID = ?
+  `,
+    [newPassword, doctorID]
+  );
+}
+
+export async function updatePatientProcedure(admissionID, procedure) {
+  await pool.query(
+    `
+    UPDATE admission
+    SET \`procedure\` = ?
+    WHERE admissionID = ?
+  `,
+    [procedure, admissionID]
+  );
+}
+
+export async function updatePatientDiagnosis(admissionID, diagnosis) {
+  await pool.query(
+    `
+    UPDATE admission
+    SET diagnosis = ?
+    WHERE admissionID = ?
+  `,
+    [diagnosis, admissionID]
+  );
+}
+
+export async function updatePatientDischarge(admissionID) {
+  await pool.query(
+    `
+    UPDATE admission
+    SET dischargeDate = CURDATE()
+    WHERE admissionID = ?
+  `,
+    [admissionID]
   );
 }
 
