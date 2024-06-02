@@ -12,23 +12,11 @@ const pool = mysql
   .promise();
 
 // * GET FUNCTIONS
-export async function getPatients() {
+export async function getAdmissions() {
   const [rows] = await pool.query(`
-    SELECT * FROM patient
+    SELECT * FROM admission
   `);
   return rows;
-}
-
-export async function getPatient(patientID) {
-  const [rows] = await pool.query(
-    `
-    SELECT * FROM patient
-    WHERE patientID = ?
-  `,
-    [patientID]
-  );
-
-  return rows[0];
 }
 
 export async function getDoctors() {
@@ -50,7 +38,51 @@ export async function getDoctor(doctorID) {
   return rows[0];
 }
 
+export async function getPatients() {
+  const [rows] = await pool.query(`
+    SELECT * FROM patient
+  `);
+  return rows;
+}
+
+export async function getPatient(patientID) {
+  const [rows] = await pool.query(
+    `
+    SELECT * FROM patient
+    WHERE patientID = ?
+  `,
+    [patientID]
+  );
+
+  return rows[0];
+}
+
 // * CREATE FUNCTIONS
+
+export async function createAdmission(patientID, complaints, medications) {
+  await pool.query(
+    `
+    INSERT INTO admission (patientID, admissionDate, complaints, medications)
+    VALUES (?, CURDATE(), ?, ?)
+  `,
+    [patientID, complaints, medications]
+  );
+}
+
+export async function createDoctor(
+  doctorName,
+  doctorStartTime,
+  doctorEndTime,
+  doctorPassword
+) {
+  await pool.query(
+    `
+    INSERT INTO doctor (doctorName, doctorStartTime, doctorEndTime, doctorPassword)
+    VALUES (?, ?, ?, ?)
+  `,
+    [doctorName, doctorStartTime, doctorEndTime, doctorPassword]
+  );
+}
 
 export async function createPatient(
   firstName,
@@ -118,27 +150,41 @@ export async function createPatient(
   return getPatient(patientID);
 }
 
-export async function createAdmission(patientID, complaints, medications) {
+// * UPDATE functions
+export async function updateAdmissionDoctor(admissionID, doctorID) {
   await pool.query(
     `
-    INSERT INTO admission (patientID, admissionDate, complaints, medications)
-    VALUES (?, CURDATE(), ?, ?)
+    UPDATE admission 
+    SET doctorID = ? 
+    WHERE admissionID = ?;
   `,
-    [patientID, complaints, medications]
+    [doctorID, admissionID]
   );
 }
 
-export async function createDoctor(
-  doctorName,
+export async function updateDoctorShift(
+  doctorID,
   doctorStartTime,
-  doctorEndTime,
-  doctorPassword
+  doctorEndtime
 ) {
   await pool.query(
     `
-    INSERT INTO doctor (doctorName, doctorStartTime, doctorEndTime, doctorPassword)
-    VALUES (?, ?, ?, ?)
+    UPDATE doctor
+    SET doctorStartTime = ?, doctorEndTime = ?
+    WHERE doctorID = ? 
   `,
-    [doctorName, doctorStartTime, doctorEndTime, doctorPassword]
+    [doctorStartTime, doctorEndtime, doctorID]
+  );
+}
+
+// * DELETE functions
+
+export async function deleteAdmission(admissionID) {
+  await pool.query(
+    `
+    DELETE FROM admission
+    WHERE admissionID = ?
+  `,
+    [admissionID]
   );
 }
