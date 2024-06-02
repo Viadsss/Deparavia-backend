@@ -1,9 +1,10 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
-import { createAdmission, createPatient } from "../database.js";
+import { createAdmission, createPatient, getPatient } from "../database.js";
 
 const admissionRouter = Router();
 
+// New Admission
 admissionRouter.post("/new", async (req, res) => {
   try {
     const {
@@ -52,8 +53,6 @@ admissionRouter.post("/new", async (req, res) => {
       hashPassword
     );
 
-    console.log(patient);
-
     await createAdmission(patient.patientID, complaints, medications);
     res.send(patient);
   } catch (err) {
@@ -61,5 +60,37 @@ admissionRouter.post("/new", async (req, res) => {
     res.status(500).send("Failed to create new patient admission");
   }
 });
+
+// Returning Admission
+admissionRouter.post("/returning", async (req, res) => {
+  try {
+    const { patientID, complaints, medications } = req.body;
+    await createAdmission(patientID, complaints, medications);
+    res.send("Created returning patient admission successfully");
+  } catch (err) {
+    console.error("Error creating returning patient admission", err);
+    res
+      .status(500)
+      .send("Multiple admissions in the same day is not allowed currently");
+  }
+});
+
+admissionRouter.post("/returning/login", async (req, res) => {
+  try {
+    const { patientID, password } = req.body;
+
+    const patient = await getPatient(patientID);
+    if (!patient) return res.status(401).send("Wrong credentials");
+
+    const isMatch = await bcrypt.compare(password, patient.password);
+    if (!isMatch) return res.status(401).send("Wrong credentials");
+
+    res.send("Login successful");
+  } catch (err) {
+    console.error("Error logging in as patient", err);
+    res.status(500).send("Failed to login as patient");
+  }
+});
+
 
 export default admissionRouter;
