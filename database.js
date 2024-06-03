@@ -165,6 +165,21 @@ export async function createPatient(
   return getPatient(patientID);
 }
 
+export async function createVisitor(
+  patientID,
+  visitorName,
+  visitorRelationship,
+  visitorContactNumber
+) {
+  await pool.query(
+    `
+    INSERT INTO visitor (patientID, visitorDate, visitorName, visitorRelationship, visitorContactNumber)
+    VALUES (?, CURDATE(), ?, ?, ?)
+  `,
+    [patientID, visitorName, visitorRelationship, visitorContactNumber]
+  );
+}
+
 // * UPDATE functions
 export async function updateAdmissionDoctor(admissionID, doctorID) {
   await pool.query(
