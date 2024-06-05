@@ -72,7 +72,52 @@ export async function getPatientsOfDoctor(doctorID) {
   return rows;
 }
 
-// * CREATE FUNCTIONS
+export async function getVisitors() {
+  const [rows] = await pool.query(`
+    SELECT * FROM visitor
+  `);
+  return rows;
+}
+
+export async function getPatientVisitors(patientID) {
+  const [rows] = await pool.query(
+    `
+    SELECT
+    visitorName,
+    visitorRelationship,
+    visitorContactNumber,
+    visitorDate
+    FROM visitor
+    WHERE patientID = ?
+    `,
+    [patientID]
+  );
+
+  return rows;
+}
+
+export async function getPatientAdmissions(patientID) {
+  const [rows] = await pool.query(
+    `
+    SELECT 
+    admission.admissionID,
+    doctor.doctorName,
+    admission.complaints,
+    admission.medications,
+    admission.procedure,
+    admission.diagnosis,
+    admission.admissionDate,
+    admission.dischargeDate
+    FROM admission
+    LEFT JOIN doctor ON admission.doctorID = doctor.doctorID
+    WHERE admission.patientID = ?
+    `,
+    [patientID]
+  );
+  return rows;
+}
+
+// * CREATE Functions
 
 export async function createAdmission(patientID, complaints, medications) {
   await pool.query(
@@ -248,6 +293,69 @@ export async function updatePatientDischarge(admissionID) {
     WHERE admissionID = ?
   `,
     [admissionID]
+  );
+}
+
+export async function updatePatientDetails(patientID, details) {
+  const {
+    height,
+    weight,
+    maritalStatus,
+    contactNumber,
+    emailAddress,
+    streetAddress,
+    city,
+    province,
+    zipCode,
+    emergencyName,
+    emergencyRelationship,
+    emergencyContactNumber,
+  } = details;
+
+  await pool.query(
+    `
+    UPDATE patient
+    SET
+      height = ?,
+      weight = ?,
+      maritalStatus = ?,
+      contactNumber = ?,
+      emailAddress = ?,
+      streetAddress = ?,
+      city = ?,
+      province = ?,
+      zipCode = ?,
+      emergencyName = ?,
+      emergencyRelationship = ?,
+      emergencyContactNumber = ?
+    WHERE patientID = ?
+  `,
+    [
+      height,
+      weight,
+      maritalStatus,
+      contactNumber,
+      emailAddress,
+      streetAddress,
+      city,
+      province,
+      zipCode,
+      emergencyName,
+      emergencyRelationship,
+      emergencyContactNumber,
+      patientID,
+    ]
+  );
+}
+
+export async function updatePatientPassword(patientID, newPassword) {
+  await pool.query(
+    `
+    UPDATE patient
+    SET password = ?
+    WHERE patientID = ?
+  `,
+    [newPassword, patientID]
   );
 }
 

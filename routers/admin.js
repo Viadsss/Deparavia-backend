@@ -8,6 +8,7 @@ import {
   getPatients,
   updateAdmissionDoctor,
   updateDoctorShift,
+  getVisitors,
 } from "../database.js";
 
 const adminRouter = Router();
@@ -101,6 +102,85 @@ adminRouter.get("/patients", async (req, res) => {
   } catch (err) {
     console.error("Error fetching all patients", err);
     res.status(500).send("Failed to fetch all patients");
+  }
+});
+
+adminRouter.put("/patients/:id", async (req, res) => {
+  try {
+    const patientId = req.params.id;
+    const {
+      height,
+      weight,
+      maritalStatus,
+      contactNumber,
+      emailAddress,
+      streetAddress,
+      city,
+      province,
+      zipCode,
+      emergencyContactName,
+      emergencyContactRelationship,
+      emergencyContactNumber,
+    } = req.body;
+
+    await updatePatientDetails(patientId, {
+      height,
+      weight,
+      maritalStatus,
+      contactNumber,
+      emailAddress,
+      streetAddress,
+      city,
+      province,
+      zipCode,
+      emergencyContactName,
+      emergencyContactRelationship,
+      emergencyContactNumber,
+    });
+
+    res.send("Patient details updated successfully");
+  } catch (err) {
+    console.error("Error updating patient details", err);
+    res.status(500).send("Failed to update patient details");
+  }
+});
+
+adminRouter.put("/patients/:id/password", async (req, res) => {
+  try {
+    const patientID = req.params.id;
+    const { originalPassword, newPassword } = req.body;
+
+    const patient = await getPatient(patientID);
+    if (!patient) {
+      return res.status(404).send("Patient not found");
+    }
+
+    const isMatch = await bcrypt.compare(
+      originalPassword,
+      patient.patientPassword
+    );
+    if (!isMatch) {
+      return res.status(401).send("Incorrect original password");
+    }
+
+    const hashPassword = await bcrypt.hash(newPassword, 13);
+
+    await updatePatientPassword(patientID, hashPassword);
+    res.send("Password successfully changed");
+  } catch (err) {
+    console.error("Error updating the password of patient", err);
+    res.status(500).send("Failed to update the password of patient");
+  }
+});
+
+// Visitors
+adminRouter.get("/visitors", async (req, res) => {
+  try {
+    const visitors = await getVisitors();
+    res.send(visitors);
+  } catch (err) {
+    console.error("Error fetching all visitors", err);
+    res.status(500).send("Failed to fetch all visitors");
   }
 });
 
