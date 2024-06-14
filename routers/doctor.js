@@ -40,6 +40,9 @@ doctorRouter.get("/:id", async (req, res) => {
   }
 });
 
+// TODO: Total of Patient this Doctor Handles
+doctorRouter.get("/:id/total", async (req, res) => {});
+
 doctorRouter.put("/:id/password", async (req, res) => {
   try {
     const doctorID = req.params.id;

@@ -186,6 +186,12 @@ adminRouter.get("/visitors", async (req, res) => {
 });
 
 // Total Rows
+
+// TODO: Admission Total
+adminRouter.get("/admissions/total", async (req, res) => {});
+// TODO: Doctor Total
+adminRouter.get("/doctors/total", async (req, res) => {});
+
 adminRouter.get("/patients/total", async (req, res) => {
   try {
     const patientTotal = await getPatientsTotal();
@@ -195,5 +201,8 @@ adminRouter.get("/patients/total", async (req, res) => {
     res.status(500).send("Failed to fetch patient total");
   }
 });
+
+// TODO: Visitor Total
+adminRouter.get("/visitors/total", async (req, res) => {});
 
 export default adminRouter;

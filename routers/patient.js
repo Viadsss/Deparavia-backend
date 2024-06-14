@@ -147,4 +147,10 @@ patientRouter.get("/:id/visitors", async (req, res) => {
   }
 });
 
+// TODO: Get the Total Admissions of the Patient
+patientRouter.get("/:id/admissions/total", async (req, res) => {});
+
+// TODO: Get the Total Visitors of the Patient
+patientRouter.get("/:id/visitors/total", async (req, res) => {});
+
 export default patientRouter;
