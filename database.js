@@ -15,6 +15,7 @@ const pool = mysql
 export async function getAdmissions() {
   const [rows] = await pool.query(`
     SELECT * FROM admission
+    ORDER BY admissionDate DESC
   `);
   return rows;
 }
@@ -84,6 +85,7 @@ export async function getPatientsOfDoctor(doctorID) {
 export async function getVisitors() {
   const [rows] = await pool.query(`
     SELECT * FROM visitor
+    ORDER BY visitorID DESC
   `);
   return rows;
 }
@@ -98,6 +100,7 @@ export async function getPatientVisitors(patientID) {
       visitorDate
     FROM visitor
     WHERE patientID = ?
+    ORDER BY visitorDate DESC
     `,
     [patientID]
   );
@@ -117,12 +120,14 @@ export async function getPatientAdmissions(patientID) {
       admission.diagnosis,
       admission.admissionDate,
       admission.dischargeDate
-    FROM doctor, admission
-    WHERE admission.doctorID = doctor.doctorID 
-      AND admission.patientID = ?
+    FROM admission
+    INNER JOIN doctor ON admission.doctorID = doctor.doctorID
+    WHERE admission.patientID = ?
+    ORDER BY admissionDate DESC, dischargeDate DESC
     `,
     [patientID]
   );
+
   return rows;
 }
 
