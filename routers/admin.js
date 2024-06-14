@@ -9,6 +9,7 @@ import {
   updateAdmissionDoctor,
   updateDoctorShift,
   getVisitors,
+  getPatientsTotal,
 } from "../database.js";
 
 const adminRouter = Router();
@@ -181,6 +182,17 @@ adminRouter.get("/visitors", async (req, res) => {
   } catch (err) {
     console.error("Error fetching all visitors", err);
     res.status(500).send("Failed to fetch all visitors");
+  }
+});
+
+// Total Rows
+adminRouter.get("/patients/total", async (req, res) => {
+  try {
+    const patientTotal = await getPatientsTotal();
+    res.send(patientTotal);
+  } catch (err) {
+    console.error("Error fetching the patient total", err);
+    res.status(500).send("Failed to fetch patient total");
   }
 });
 
