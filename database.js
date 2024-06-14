@@ -60,12 +60,21 @@ export async function getPatient(patientID) {
 export async function getPatientsOfDoctor(doctorID) {
   const [rows] = await pool.query(
     `
-    SELECT admissionID, patient.patientID, CONCAT(patient.firstName, ' ', patient.lastName, ' ', patient.middleName) AS fullName, patient.sex, patient.height, patient.weight, admission.complaints, admission.medications, admission.procedure, admission.diagnosis
-    FROM patient
-    INNER JOIN admission
-    ON patient.patientID = admission.patientID
-    WHERE admission.doctorID = ?
-    AND admission.dischargeDate IS NULL
+    SELECT
+      admission.admissionID,
+      patient.patientID,
+      CONCAT(patient.firstName, ' ', patient.lastName, ' ', patient.middleName) AS fullName,
+      patient.sex,
+      patient.height,
+      patient.weight,
+      admission.complaints,
+      admission.medications,
+      admission.procedure,
+      admission.diagnosis
+    FROM patient, admission
+    WHERE patient.patientID = admission.patientID
+      AND admission.doctorID = ?
+      AND admission.dischargeDate IS NULL
   `,
     [doctorID]
   );
@@ -83,10 +92,10 @@ export async function getPatientVisitors(patientID) {
   const [rows] = await pool.query(
     `
     SELECT
-    visitorName,
-    visitorRelationship,
-    visitorContactNumber,
-    visitorDate
+      visitorName,
+      visitorRelationship,
+      visitorContactNumber,
+      visitorDate
     FROM visitor
     WHERE patientID = ?
     `,
@@ -100,21 +109,29 @@ export async function getPatientAdmissions(patientID) {
   const [rows] = await pool.query(
     `
     SELECT 
-    admission.admissionID,
-    doctor.doctorName,
-    admission.complaints,
-    admission.medications,
-    admission.procedure,
-    admission.diagnosis,
-    admission.admissionDate,
-    admission.dischargeDate
-    FROM admission
-    LEFT JOIN doctor ON admission.doctorID = doctor.doctorID
-    WHERE admission.patientID = ?
+      admission.admissionID,
+      doctor.doctorName,
+      admission.complaints,
+      admission.medications,
+      admission.procedure,
+      admission.diagnosis,
+      admission.admissionDate,
+      admission.dischargeDate
+    FROM doctor, admission
+    WHERE admission.doctorID = doctor.doctorID 
+      AND admission.patientID = ?
     `,
     [patientID]
   );
   return rows;
+}
+
+export async function getPatientsTotal() {
+  const [rows] = await pool.query(`
+    SELECT count(*) AS total FROM patient
+  `);
+
+  return rows[0];
 }
 
 // * CREATE Functions
