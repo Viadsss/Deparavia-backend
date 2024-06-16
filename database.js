@@ -20,11 +20,52 @@ export async function getAdmissions() {
   return rows;
 }
 
+export async function getAdmissionsNoDoctor() {
+  const [rows] = await pool.query(`
+    SELECT * FROM admission
+    WHERE doctorID IS NULL
+    ORDER BY admissionDate DESC
+  `);
+  return rows;
+}
+
+export async function getAdmissionsNotDischarge() {
+  const [rows] = await pool.query(`
+    SELECT * FROM admission
+    WHERE dischargeDate IS NULL
+    ORDER BY admissionDate DESC
+  `);
+  return rows;
+}
+
 export async function getDoctors() {
   const [rows] = await pool.query(`
     SELECT * FROM doctor
   `);
   return rows;
+}
+
+export async function getAdmissionsTotal() {
+  const [rows] = await pool.query(`
+    SELECT COUNT(*) AS total FROM admission
+  `);
+  return rows[0];
+}
+
+export async function getAdmissionsNoDoctorTotal() {
+  const [rows] = await pool.query(`
+    SELECT COUNT(*) AS total FROM admission
+    WHERE doctorID IS NULL
+  `);
+  return rows[0];
+}
+
+export async function getAdmissionsNotDischargeTotal() {
+  const [rows] = await pool.query(`
+    SELECT COUNT(*) AS total FROM admission
+    WHERE dischargeDate IS NULL
+  `);
+  return rows[0];
 }
 
 export async function getDoctor(doctorID) {
@@ -120,9 +161,9 @@ export async function getPatientAdmissions(patientID) {
       admission.diagnosis,
       admission.admissionDate,
       admission.dischargeDate
-    FROM admission
-    INNER JOIN doctor ON admission.doctorID = doctor.doctorID
-    WHERE admission.patientID = ?
+    FROM admission, doctor
+    WHERE admission.doctorID = doctor.doctorID
+      AND admission.patientID = ?
     ORDER BY admissionDate DESC, dischargeDate DESC
     `,
     [patientID]
@@ -131,9 +172,21 @@ export async function getPatientAdmissions(patientID) {
   return rows;
 }
 
+export async function getPatientAdmissionsTotal(patientID) {
+  const [rows] = await pool.query(
+    `
+    SELECT COUNT(*) AS total FROM admission
+    WHERE patientID = ?
+  `,
+    [patientID]
+  );
+
+  return rows[0];
+}
+
 export async function getPatientsTotal() {
   const [rows] = await pool.query(`
-    SELECT count(*) AS total FROM patient
+    SELECT COUNT(*) AS total FROM patient
   `);
 
   return rows[0];

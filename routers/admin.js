@@ -10,6 +10,11 @@ import {
   updateDoctorShift,
   getVisitors,
   getPatientsTotal,
+  getAdmissionsNoDoctor,
+  getAdmissionsNotDischarge,
+  getAdmissionsTotal,
+  getAdmissionsNoDoctorTotal,
+  getAdmissionsNotDischargeTotal,
 } from "../database.js";
 
 const adminRouter = Router();
@@ -22,6 +27,31 @@ adminRouter.get("/admissions", async (req, res) => {
   } catch (err) {
     console.error("Error fetching all admissions", err);
     res.status(500).send("Failed to fetch all admissions");
+  }
+});
+
+adminRouter.get("/admissions/noDoctor", async (req, res) => {
+  try {
+    const admissions = await getAdmissionsNoDoctor();
+    res.send(admissions);
+  } catch (err) {
+    console.error("Error fetching all admissions with no doctors", err);
+    res.status(500).send("Failed to fetch all admissions with no doctors");
+  }
+});
+
+adminRouter.get("/admissions/notDischarge", async (req, res) => {
+  try {
+    const admissions = await getAdmissionsNotDischarge();
+    res.send(admissions);
+  } catch (err) {
+    console.error(
+      "Error fetching all admissions that is not yet discharged",
+      err
+    );
+    res
+      .status(500)
+      .send("Failed to fetch all admissions that is not yet discharged");
   }
 });
 
@@ -188,14 +218,46 @@ adminRouter.get("/visitors", async (req, res) => {
 // Total Rows
 
 // TODO: Admission Total
-adminRouter.get("/admissions/total", async (req, res) => {});
+adminRouter.get("/admissions/total", async (req, res) => {
+  try {
+    const total = await getAdmissionsTotal();
+    res.send(total);
+  } catch (err) {
+    console.error("Error fetching the admission total", err);
+    res.status(500).send("Failed to fetch admission total");
+  }
+});
+
+adminRouter.get("/admissions/noDoctor/total", async (req, res) => {
+  try {
+    const total = await getAdmissionsNoDoctorTotal();
+    res.send(total);
+  } catch (err) {
+    console.error("Error fetching the admissions with no doctor total", err);
+    res.status(500).send("Failed to fetch admission with no doctor total");
+  }
+});
+
+adminRouter.get("/admissions/notDischarge/total", async (req, res) => {
+  try {
+    const total = await getAdmissionsNotDischargeTotal();
+    res.send(total);
+  } catch (err) {
+    console.error(
+      "Error fetching the admissions not discharged yet total",
+      err
+    );
+    res.status(500).send("Failed to fetch admission not discharged yet total");
+  }
+});
+
 // TODO: Doctor Total
 adminRouter.get("/doctors/total", async (req, res) => {});
 
 adminRouter.get("/patients/total", async (req, res) => {
   try {
-    const patientTotal = await getPatientsTotal();
-    res.send(patientTotal);
+    const total = await getPatientsTotal();
+    res.send(total);
   } catch (err) {
     console.error("Error fetching the patient total", err);
     res.status(500).send("Failed to fetch patient total");
