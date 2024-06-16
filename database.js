@@ -192,6 +192,37 @@ export async function getPatientsTotal() {
   return rows[0];
 }
 
+// GET Doctor Total - Jhana
+export async function getDoctorsTotal() {
+  const [rows] = await pool.query(`
+    SELECT COUNT(*) AS total FROM doctor
+  `);
+
+  return rows[0];
+}
+
+// GET Visitor Total - Hazel
+export async function getVisitorsTotal() {
+  const [rows] = await pool.query(`
+    SELECT COUNT(*) AS total FROM visitor
+  `);
+
+  return rows[0];
+}
+
+// TODO: GET Total Visitors of the Patient - Kaye
+export async function getPatientVisitorsTotal(patientID) {
+  const [rows] = await pool.query(
+    `
+    SELECT COUNT(*) AS total
+    FROM visitor
+    WHERE patientID = ?
+    `,
+    [patientID]
+  );
+  return rows[0];
+}
+
 // * CREATE Functions
 
 export async function createAdmission(patientID, complaints, medications) {
