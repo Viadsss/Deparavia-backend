@@ -6,6 +6,7 @@ import {
   getPatientAdmissions,
   getPatientVisitors,
   getPatientAdmissionsTotal,
+  getPatientVisitorsTotal,
 } from "../database.js";
 import bcrypt from "bcrypt";
 
@@ -161,6 +162,15 @@ patientRouter.get("/:id/admissions/total", async (req, res) => {
 });
 
 // TODO: Get the Total Visitors of the Patient
-patientRouter.get("/:id/visitors/total", async (req, res) => {});
+patientRouter.get("/:id/visitors/total", async (req, res) => {
+  try {
+    const patientID = req.params.id;
+    const total = await getPatientVisitorsTotal(patientID);
+    res.send(total);
+  } catch (err) {
+    console.error("Error fetching the patient visitors total", err);
+    res.status(500).send("Failed to fetch patient visitors total");
+  }
+});
 
 export default patientRouter;

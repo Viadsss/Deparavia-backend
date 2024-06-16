@@ -15,6 +15,8 @@ import {
   getAdmissionsTotal,
   getAdmissionsNoDoctorTotal,
   getAdmissionsNotDischargeTotal,
+  getVisitorsTotal,
+  getDoctorsTotal,
 } from "../database.js";
 
 const adminRouter = Router();
@@ -215,8 +217,6 @@ adminRouter.get("/visitors", async (req, res) => {
   }
 });
 
-// Total Rows
-
 // TODO: Admission Total
 adminRouter.get("/admissions/total", async (req, res) => {
   try {
@@ -251,8 +251,15 @@ adminRouter.get("/admissions/notDischarge/total", async (req, res) => {
   }
 });
 
-// TODO: Doctor Total
-adminRouter.get("/doctors/total", async (req, res) => {});
+adminRouter.get("/doctors/total", async (req, res) => {
+  try {
+    const total = await getDoctorsTotal();
+    res.send(total);
+  } catch (err) {
+    console.error("Error fetching the doctor total", err);
+    res.status(500).send("Failed to fetch doctor total");
+  }
+});
 
 adminRouter.get("/patients/total", async (req, res) => {
   try {
@@ -264,7 +271,14 @@ adminRouter.get("/patients/total", async (req, res) => {
   }
 });
 
-// TODO: Visitor Total
-adminRouter.get("/visitors/total", async (req, res) => {});
+adminRouter.get("/visitors/total", async (req, res) => {
+  try {
+    const total = await getVisitorsTotal();
+    res.send(total);
+  } catch (err) {
+    console.error("Error fetching the visitor total", err);
+    res.status(500).send("Failed to fetch visitor total");
+  }
+});
 
 export default adminRouter;
