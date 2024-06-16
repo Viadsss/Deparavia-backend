@@ -161,9 +161,9 @@ export async function getPatientAdmissions(patientID) {
       admission.diagnosis,
       admission.admissionDate,
       admission.dischargeDate
-    FROM admission, doctor
-    WHERE admission.doctorID = doctor.doctorID
-      AND admission.patientID = ?
+    FROM admission
+    LEFT JOIN doctor ON admission.doctorID = doctor.doctorID
+    WHERE admission.patientID = ?
     ORDER BY admissionDate DESC, dischargeDate DESC
     `,
     [patientID]
@@ -210,7 +210,6 @@ export async function getVisitorsTotal() {
   return rows[0];
 }
 
-// TODO: GET Total Visitors of the Patient - Kaye
 export async function getPatientVisitorsTotal(patientID) {
   const [rows] = await pool.query(
     `
