@@ -3,7 +3,6 @@ import { format } from "date-fns";
 import {
   getPatient,
   updatePatientDetails,
-  updatePatientPassword,
   getPatientAdmissions,
   getPatientVisitors,
   getPatientAdmissionsTotal,
@@ -93,32 +92,6 @@ patientRouter.put("/:id/details", async (req, res) => {
     res
       .status(500)
       .json({ message: "Error updating patient", error: err.message });
-  }
-});
-
-patientRouter.put("/:id/password", async (req, res) => {
-  try {
-    const patientID = req.params.id;
-    const { originalPassword, newPassword } = req.body;
-
-    const patient = await getPatient(patientID);
-    if (!patient) {
-      return res.status(404).send("Patient not found");
-    }
-
-    const isMatch = await bcrypt.compare(originalPassword, patient.password);
-    if (!isMatch) {
-      return res.status(401).send("Incorrect original password");
-    }
-
-    const hashPassword = await bcrypt.hash(newPassword, 13);
-
-    await updatePatientPassword(patientID, hashPassword);
-
-    res.send("Password updated successfully");
-  } catch (err) {
-    console.error("Error updating the password of patient", err);
-    res.status(500).send("Failed to update the password of patient");
   }
 });
 

@@ -19,8 +19,7 @@ CREATE TABLE IF NOT EXISTS patient (
   zipCode INT NOT NULL,
   emergencyName VARCHAR(60) NOT NULL,
   emergencyRelationship VARCHAR(30) NOT NULL,
-  emergencyContactNumber VARCHAR(11) NOT NULL,
-  password CHAR(60) NOT NULL
+  emergencyContactNumber VARCHAR(11) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS doctor (

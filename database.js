@@ -266,13 +266,12 @@ export async function createPatient(
   zipCode,
   emergencyName,
   emergencyRelationship,
-  emergencyContactNumber,
-  password
+  emergencyContactNumber
 ) {
   await pool.query(
     `
-    INSERT INTO patient (firstName, lastName, middleName, dateOfBirth, sex, height, weight, maritalStatus, contactNumber, emailAddress, streetAddress, city, province, zipCode, emergencyName, emergencyRelationship, emergencyContactNumber, password)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO patient (firstName, lastName, middleName, dateOfBirth, sex, height, weight, maritalStatus, contactNumber, emailAddress, streetAddress, city, province, zipCode, emergencyName, emergencyRelationship, emergencyContactNumber)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `,
     [
       firstName,
@@ -292,7 +291,6 @@ export async function createPatient(
       emergencyName,
       emergencyRelationship,
       emergencyContactNumber,
-      password,
     ]
   );
 
@@ -450,17 +448,6 @@ export async function updatePatientDetails(patientID, details) {
       emergencyContactNumber,
       patientID,
     ]
-  );
-}
-
-export async function updatePatientPassword(patientID, newPassword) {
-  await pool.query(
-    `
-    UPDATE patient
-    SET password = ?
-    WHERE patientID = ?
-  `,
-    [newPassword, patientID]
   );
 }
 
