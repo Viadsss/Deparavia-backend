@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { format } from "date-fns";
 import {
   getPatient,
   updatePatientDetails,
@@ -21,6 +22,28 @@ patientRouter.post("/login", async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, patient.password);
     if (!isMatch) return res.status(401).send("Wrong credentials");
+
+    res.send(patient);
+  } catch (err) {
+    console.error("Error logging in as patient", err);
+    res.status(500).send("Failed to login as patient");
+  }
+});
+
+patientRouter.post("/login2", async (req, res) => {
+  try {
+    const { patientID, dateOfBirth, contactNumber } = req.body;
+
+    const patient = await getPatient(patientID);
+    if (!patient) return res.status(401).send("Wrong credentials");
+
+    if (format(patient.dateOfBirth, "yyyy-MM-dd") != dateOfBirth) {
+      return res.status(401).send("Wrong credentials");
+    }
+
+    if (patient.contactNumber != contactNumber) {
+      return res.status(401).send("Wrong credentials");
+    }
 
     res.send(patient);
   } catch (err) {
