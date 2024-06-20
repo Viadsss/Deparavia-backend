@@ -462,3 +462,49 @@ export async function deleteAdmission(admissionID) {
     [admissionID]
   );
 }
+
+export async function getDailyAdmissionsCurrentMonth() {
+  const [rows] = await pool.query(`
+  SELECT DAY(admissionDate) AS day, COUNT(*) AS total
+  FROM admission
+  WHERE YEAR(admissionDate) = YEAR(CURDATE())
+    AND MONTH (admissionDate) = MONTH(CURDATE())
+  GROUP BY day
+  `);
+
+  return rows;
+}
+
+export async function getDailyVisitorsCurrentMonth() {
+  const [rows] = await pool.query(`
+  SELECT DAY(visitorDate) AS day, COUNT(*) AS total
+  FROM visitor
+  WHERE YEAR(visitorDate) = YEAR(CURDATE())
+    AND MONTH (visitorDate) = MONTH(CURDATE())
+  GROUP BY day
+  `);
+
+  return rows;
+}
+
+export async function getMonthlyAdmissionsCurrentYear() {
+  const [rows] = await pool.query(`
+    SELECT MONTHNAME(admissionDate) AS month, COUNT(*) AS total
+    FROM admission
+    WHERE YEAR(admissionDate) = YEAR(CURDATE())
+    GROUP BY month
+  `);
+
+  return rows;
+}
+
+export async function getMonthlyVisitorsCurrentYear() {
+  const [rows] = await pool.query(`
+    SELECT MONTHNAME(visitorDate) AS month, COUNT(*) AS total
+    FROM visitor
+    WHERE YEAR(visitorDate) = YEAR(CURDATE())
+    GROUP BY month
+  `);
+
+  return rows;
+}

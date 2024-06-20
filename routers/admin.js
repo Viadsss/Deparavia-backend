@@ -17,6 +17,10 @@ import {
   getAdmissionsNotDischargeTotal,
   getVisitorsTotal,
   getDoctorsTotal,
+  getDailyAdmissionsCurrentMonth,
+  getMonthlyAdmissionsCurrentYear,
+  getDailyVisitorsCurrentMonth,
+  getMonthlyVisitorsCurrentYear,
 } from "../database.js";
 
 const adminRouter = Router();
@@ -54,6 +58,56 @@ adminRouter.get("/admissions/notDischarge", async (req, res) => {
     res
       .status(500)
       .send("Failed to fetch all admissions that is not yet discharged");
+  }
+});
+
+adminRouter.get("/admissions/month", async (req, res) => {
+  try {
+    const totalAdmissionsPerDay = await getDailyAdmissionsCurrentMonth();
+    res.send(totalAdmissionsPerDay);
+  } catch (err) {
+    console.error("Error fetching the total admissions per day for this month");
+    res
+      .status(500)
+      .send("Failed to fetch the total admissions per day for this month");
+  }
+});
+
+adminRouter.get("/visitors/month", async (req, res) => {
+  try {
+    const totalVisitorsPerDay = await getDailyVisitorsCurrentMonth();
+    res.send(totalVisitorsPerDay);
+  } catch (err) {
+    console.error("Error fetching the total visitors per day for this month");
+    res
+      .status(500)
+      .send("Failed to fetch the total visitors per day for this month");
+  }
+});
+
+adminRouter.get("/admissions/year", async (req, res) => {
+  try {
+    const totalAdmissionsPerMonth = await getMonthlyAdmissionsCurrentYear();
+    res.send(totalAdmissionsPerMonth);
+  } catch (err) {
+    console.error(
+      "Error fetching the total admissions per month for this year"
+    );
+    res
+      .status(500)
+      .send("Failed to fetch the total admissions per month for this year");
+  }
+});
+
+adminRouter.get("/visitors/year", async (req, res) => {
+  try {
+    const totalVisitorsPerMonth = await getMonthlyVisitorsCurrentYear();
+    res.send(totalVisitorsPerMonth);
+  } catch (err) {
+    console.error("Error fetching the total visitors per month for this year");
+    res
+      .status(500)
+      .send("Failed to fetch the total visitors per month for this year");
   }
 });
 
