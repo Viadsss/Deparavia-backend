@@ -198,3 +198,15 @@ INSERT INTO visitor (patientID, visitorDate, visitorName)
 VALUES ("PAT-JV-001", CURDATE(), 'John Doerr');
 select * from visitor;
 
+INSERT INTO visitor (patientID, visitorDate, visitorName, visitorRelationship, visitorContactNumber)
+VALUES
+  ("PAT-JV-001", "2024-05-17", "Test X", "Friend", "09203031436"),
+  ("PAT-JV-001", "2024-01-17", "Test A", "Friend", "09203031436"),
+  ("PAT-JV-001", "2023-11-17", "Test B", "Friend", "09203031436"),
+  ("PAT-JV-001", "2023-08-17", "Test C", "Friend", "09203031436"),
+  ("PAT-JV-001", "2023-06-24", "Test D", "Friend", "09203031436"),
+  ("PAT-JV-001", "2023-06-18", "Test E", "Friend", "09203031436");
+
+SELECT visitorID, visitorName, visitorDate
+FROM visitor
+WHERE visitorDate < CURDATE() - INTERVAL 1 MONTH;

@@ -40,7 +40,14 @@ export async function getAdmissionsNotDischarge() {
 
 export async function getDoctors() {
   const [rows] = await pool.query(`
-    SELECT * FROM doctor
+    SELECT *,
+      IF(
+        (doctorStartTime < doctorEndTime AND CURTIME() BETWEEN doctorStartTime AND doctorEndTime) OR
+        (doctorStartTime > doctorEndTime AND (CURTIME() >= doctorStartTime OR CURTIME() < doctorEndTime)),
+        'On Duty',
+        'Off Duty'
+    ) AS dutyStatus
+    FROM doctor
   `);
   return rows;
 }
@@ -497,12 +504,66 @@ export async function updatePatientDetails(patientID, details) {
 
 // * DELETE functions
 
-export async function deleteAdmission(admissionID) {
+export async function deleteVisitors() {
   await pool.query(
     `
-    DELETE FROM admission
-    WHERE admissionID = ?
+    TRUNCATE TABLE visitor
+    `
+  );
+}
+
+export async function deleteVisitor(visitorID) {
+  await pool.query(
+    `
+    DELETE FROM visitor
+    WHERE visitorID = ?
   `,
-    [admissionID]
+    [visitorID]
+  );
+}
+
+export async function deleteMultipleVisitor(visitorIDs) {
+  await pool.query(
+    `
+    DELETE FROM visitor
+    WHERE visitorID IN (?)
+    `,
+    [visitorIDs]
+  );
+}
+
+export async function deleteVisitorPastMonth() {
+  await pool.query(
+    `
+    DELETE FROM visitor
+    WHERE visitorDate < CURDATE() - INTERVAL 1 MONTH
+  `
+  );
+}
+
+export async function deleteVisitorPastThreeMonths() {
+  await pool.query(
+    `
+    DELETE FROM visitor
+    WHERE visitorDate < CURDATE() - INTERVAL 3 MONTH
+  `
+  );
+}
+
+export async function deleteVisitorPastSixMonths() {
+  await pool.query(
+    `
+    DELETE FROM visitor
+    WHERE visitorDate < CURDATE() - INTERVAL 6 MONTH
+  `
+  );
+}
+
+export async function deleteVisitorPastYear() {
+  await pool.query(
+    `
+    DELETE FROM visitor
+    WHERE visitorDate < CURDATE() - INTERVAL 1 YEAR
+  `
   );
 }

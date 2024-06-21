@@ -2,7 +2,6 @@ import { Router } from "express";
 import bcrypt from "bcrypt";
 import {
   createDoctor,
-  deleteAdmission,
   getAdmissions,
   getDoctors,
   getPatients,
@@ -21,6 +20,13 @@ import {
   getMonthlyAdmissionsCurrentYear,
   getDailyVisitorsCurrentMonth,
   getMonthlyVisitorsCurrentYear,
+  deleteMultipleVisitor,
+  deleteVisitor,
+  deleteVisitorPastMonth,
+  deleteVisitorPastThreeMonths,
+  deleteVisitorPastSixMonths,
+  deleteVisitorPastYear,
+  deleteVisitors,
 } from "../database.js";
 
 const adminRouter = Router();
@@ -121,18 +127,6 @@ adminRouter.put("/admissions/:id", async (req, res) => {
   } catch (err) {
     console.error("Error updating the admission doctor", err);
     res.status(500).send("Failed to update admission doctor");
-  }
-});
-
-adminRouter.delete("/admissions/:id", async (req, res) => {
-  try {
-    const admissionID = req.params.id;
-    await deleteAdmission(admissionID);
-
-    res.send("Admission deleted successfully");
-  } catch (err) {
-    console.error("Error deleting the admission", err);
-    res.status(500).send("Failed to delete admission");
   }
 });
 
@@ -268,6 +262,69 @@ adminRouter.get("/visitors", async (req, res) => {
   } catch (err) {
     console.error("Error fetching all visitors", err);
     res.status(500).send("Failed to fetch all visitors");
+  }
+});
+
+adminRouter.delete("/visitors", async (req, res) => {
+  try {
+    await deleteVisitors();
+    res.send("All visitors deleted successfully");
+  } catch (err) {
+    console.error("Error deleting all visitors", err);
+    res.status(500).send("Failed to delete all visitors");
+  }
+});
+
+adminRouter.delete("/visitors/multiple", async (req, res) => {
+  try {
+    const { visitorIDs } = req.body;
+    await deleteMultipleVisitor(visitorIDs);
+    res.send("Multiple Visitors deleted successfully");
+  } catch (err) {
+    console.error("Error deleting multiple visitors");
+    res.status(500).send("Failed to delete multiple visitors");
+  }
+});
+
+adminRouter.delete("/visitors/:id", async (req, res) => {
+  try {
+    const visitorID = req.params.id;
+    await deleteVisitor(visitorID);
+
+    res.send("Visitor deleted successfully");
+  } catch (err) {
+    console.error("Error deleting the visitor", err);
+    res.status(500).send("Failed to delete visitor");
+  }
+});
+
+adminRouter.delete("/visitors/time/:deleteTime", async (req, res) => {
+  try {
+    const deleteTime = req.params.deleteTime;
+
+    switch (deleteTime) {
+      case "1month":
+        await deleteVisitorPastMonth();
+        break;
+      case "3month":
+        await deleteVisitorPastThreeMonths();
+        break;
+      case "6month":
+        await deleteVisitorPastSixMonths();
+        break;
+      case "1year":
+        await deleteVisitorPastYear();
+        break;
+      default:
+        res.status(400).send("Invalid delete time specified");
+        return;
+    }
+    res.send(
+      `Visitors from the past ${deleteTime} have been deleted successfully`
+    );
+  } catch (err) {
+    console.error(`Error deleting visitors from past ${deleteTime}`, err);
+    res.status(500).send(`Failed to delete visitors from past ${deleteTime}`);
   }
 });
 
