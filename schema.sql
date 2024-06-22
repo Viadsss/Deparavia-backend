@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS doctor (
   doctorName VARCHAR(60) NOT NULL,
   doctorStartTime TIME NOT NULL,
   doctorEndTime TIME NOT NULL,
+  doctorStatus CHAR(1) NOT NULL,
   doctorPassword CHAR(60) NOT NULL
 );
 

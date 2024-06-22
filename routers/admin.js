@@ -6,7 +6,6 @@ import {
   getDoctors,
   getPatients,
   updateAdmissionDoctor,
-  updateDoctorShift,
   getVisitors,
   getPatientsTotal,
   getAdmissionsNoDoctor,
@@ -27,6 +26,17 @@ import {
   deleteVisitorPastSixMonths,
   deleteVisitorPastYear,
   deleteVisitors,
+  updateDoctorDetails,
+  getActiveDoctorsOnDuty,
+  getActiveDoctorsOffDuty,
+  getInactiveDoctors,
+  getDoctorsOnLeave,
+  getActiveDoctors,
+  getActiveDoctorsOnDutyTotal,
+  getActiveDoctorsOffDutyTotal,
+  getActiveDoctorsTotal,
+  getInactiveDoctorsTotal,
+  getDoctorsOnLeaveTotal,
 } from "../database.js";
 
 const adminRouter = Router();
@@ -141,10 +151,65 @@ adminRouter.get("/doctors", async (req, res) => {
   }
 });
 
+adminRouter.get("/doctors/onDuty", async (req, res) => {
+  try {
+    const doctorsOnDuty = await getActiveDoctorsOnDuty();
+    res.send(doctorsOnDuty);
+  } catch (err) {
+    console.error("Error fetching active doctors on duty", err);
+    res.status(500).send("Failed to fetch active doctors on duty");
+  }
+});
+
+adminRouter.get("/doctors/offDuty", async (req, res) => {
+  try {
+    const doctorsOffDuty = await getActiveDoctorsOffDuty();
+    res.send(doctorsOffDuty);
+  } catch (err) {
+    console.error("Error fetching active doctors off duty", err);
+    res.status(500).send("Failed to fetch active doctors off duty");
+  }
+});
+
+adminRouter.get("/doctors/active", async (req, res) => {
+  try {
+    const activeDoctors = await getActiveDoctors();
+    res.send(activeDoctors);
+  } catch (err) {
+    console.error("Error fetching active doctors", err);
+    res.status(500).send("Failed to fetch active doctors");
+  }
+});
+
+adminRouter.get("/doctors/inactive", async (req, res) => {
+  try {
+    const inactiveDoctors = await getInactiveDoctors();
+    res.send(inactiveDoctors);
+  } catch (err) {
+    console.error("Error fetching inactive doctors", err);
+    res.status(500).send("Failed to fetch inactive doctors");
+  }
+});
+
+adminRouter.get("/doctors/onLeave", async (req, res) => {
+  try {
+    const doctorsOnLeave = await getDoctorsOnLeave();
+    res.send(doctorsOnLeave);
+  } catch (err) {
+    console.error("Error fetching doctors on leave", err);
+    res.status(500).send("Failed to fetch doctors on leave");
+  }
+});
+
 adminRouter.post("/doctors", async (req, res) => {
   try {
-    const { doctorName, doctorStartTime, doctorEndTime, doctorPassword } =
-      req.body;
+    const {
+      doctorName,
+      doctorStartTime,
+      doctorEndTime,
+      doctorStatus,
+      doctorPassword,
+    } = req.body;
 
     const hashPassword = await bcrypt.hash(doctorPassword, 13);
 
@@ -152,6 +217,7 @@ adminRouter.post("/doctors", async (req, res) => {
       doctorName,
       doctorStartTime,
       doctorEndTime,
+      doctorStatus,
       hashPassword
     );
 
@@ -165,13 +231,18 @@ adminRouter.post("/doctors", async (req, res) => {
 adminRouter.put("/doctors/:id", async (req, res) => {
   try {
     const doctorID = req.params.id;
-    const { doctorStartTime, doctorEndTime } = req.body;
+    const { doctorStartTime, doctorEndTime, doctorStatus } = req.body;
 
-    await updateDoctorShift(doctorID, doctorStartTime, doctorEndTime);
-    res.send("Doctor shift updated successfully");
+    await updateDoctorDetails(
+      doctorID,
+      doctorStartTime,
+      doctorEndTime,
+      doctorStatus
+    );
+    res.send("Doctor details updated successfully");
   } catch (err) {
-    console.error("Error updating doctor shift", err);
-    res.status(500).send("Failed to update doctor shift");
+    console.error("Error updating doctor details", err);
+    res.status(500).send("Failed to update doctor details");
   }
 });
 
@@ -362,6 +433,7 @@ adminRouter.get("/admissions/notDischarge/total", async (req, res) => {
   }
 });
 
+// Doctors
 adminRouter.get("/doctors/total", async (req, res) => {
   try {
     const total = await getDoctorsTotal();
@@ -369,6 +441,56 @@ adminRouter.get("/doctors/total", async (req, res) => {
   } catch (err) {
     console.error("Error fetching the doctor total", err);
     res.status(500).send("Failed to fetch doctor total");
+  }
+});
+
+adminRouter.get("/doctors/onDuty/total", async (req, res) => {
+  try {
+    const total = await getActiveDoctorsOnDutyTotal();
+    res.send(total);
+  } catch (err) {
+    console.error("Error fetching the total of doctors on duty", err);
+    res.status(500).send("Failed to fetch total of doctors on duty");
+  }
+});
+
+adminRouter.get("/doctors/offDuty/total", async (req, res) => {
+  try {
+    const total = await getActiveDoctorsOffDutyTotal();
+    res.send(total);
+  } catch (err) {
+    console.error("Error fetching the total of doctors off duty", err);
+    res.status(500).send("Failed to fetch total of doctors off duty");
+  }
+});
+
+adminRouter.get("/doctors/active/total", async (req, res) => {
+  try {
+    const total = await getActiveDoctorsTotal();
+    res.send(total);
+  } catch (err) {
+    console.error("Error fetching the total of active doctors", err);
+    res.status(500).send("Failed to fetch total of active doctors");
+  }
+});
+
+adminRouter.get("/doctors/inactive/total", async (req, res) => {
+  try {
+    const total = await getInactiveDoctorsTotal();
+    res.send(total);
+  } catch (err) {
+    console.error("Error fetching the total of inactive doctors", err);
+    res.status(500).send("Failed to fetch total of inactive doctors");
+  }
+});
+
+adminRouter.get("/doctors/onLeave/total", async (req, res) => {
+  try {
+    const total = await getDoctorsOnLeaveTotal();
+    res.send(total);
+  } catch (err) {
+    console.error("Error fetching the total of doctors on leave", err);
+    res.status(500).send("Failed to fetch total of doctors on leave");
   }
 });
 

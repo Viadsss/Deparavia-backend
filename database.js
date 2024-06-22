@@ -46,7 +46,7 @@ export async function getDoctors() {
         (doctorStartTime > doctorEndTime AND (CURTIME() >= doctorStartTime OR CURTIME() < doctorEndTime)),
         'On Duty',
         'Off Duty'
-    ) AS dutyStatus
+      ) AS dutyStatus
     FROM doctor
   `);
   return rows;
@@ -84,6 +84,142 @@ export async function getDoctor(doctorID) {
     [doctorID]
   );
 
+  return rows[0];
+}
+
+export async function getActiveDoctorsOnDuty() {
+  const [rows] = await pool.query(`
+    SELECT *,
+      IF(
+        (doctorStartTime < doctorEndTime AND CURTIME() BETWEEN doctorStartTime AND doctorEndTime) OR
+        (doctorStartTime > doctorEndTime AND (CURTIME() >= doctorStartTime OR CURTIME() < doctorEndTime)),
+        'On Duty',
+        'Off Duty'
+      ) AS dutyStatus
+    FROM doctor
+    WHERE
+      doctorStatus = "A" AND
+      (doctorStartTime < doctorEndTime AND CURTIME() BETWEEN doctorStartTime AND doctorEndTime) OR
+      (doctorStartTime > doctorEndTime AND (CURTIME() >= doctorStartTime OR CURTIME() < doctorEndTime))
+  `);
+  return rows;
+}
+
+export async function getActiveDoctorsOffDuty() {
+  const [rows] = await pool.query(`
+    SELECT *,
+      IF(
+        (doctorStartTime < doctorEndTime AND CURTIME() BETWEEN doctorStartTime AND doctorEndTime) OR
+        (doctorStartTime > doctorEndTime AND (CURTIME() >= doctorStartTime OR CURTIME() < doctorEndTime)),
+        'On Duty',
+        'Off Duty'
+      ) AS dutyStatus
+    FROM doctor
+    WHERE 
+      doctorStatus = "A" AND
+      NOT (
+      (doctorStartTime < doctorEndTime AND CURTIME() BETWEEN doctorStartTime AND doctorEndTime) OR
+      (doctorStartTime > doctorEndTime AND (CURTIME() >= doctorStartTime OR CURTIME() < doctorEndTime))
+    )
+  `);
+  return rows;
+}
+
+export async function getActiveDoctors() {
+  const [rows] = await pool.query(`
+    SELECT *,
+      IF(
+        (doctorStartTime < doctorEndTime AND CURTIME() BETWEEN doctorStartTime AND doctorEndTime) OR
+        (doctorStartTime > doctorEndTime AND (CURTIME() >= doctorStartTime OR CURTIME() < doctorEndTime)),
+        'On Duty',
+        'Off Duty'
+      ) AS dutyStatus
+    FROM doctor
+    WHERE doctorStatus = "A"
+  `);
+  return rows;
+}
+
+export async function getInactiveDoctors() {
+  const [rows] = await pool.query(`
+    SELECT *,
+      IF(
+        (doctorStartTime < doctorEndTime AND CURTIME() BETWEEN doctorStartTime AND doctorEndTime) OR
+        (doctorStartTime > doctorEndTime AND (CURTIME() >= doctorStartTime OR CURTIME() < doctorEndTime)),
+        'On Duty',
+        'Off Duty'
+      ) AS dutyStatus
+    FROM doctor
+    WHERE doctorStatus = "I"
+  `);
+  return rows;
+}
+
+export async function getDoctorsOnLeave() {
+  const [rows] = await pool.query(`
+    SELECT *,
+      IF(
+        (doctorStartTime < doctorEndTime AND CURTIME() BETWEEN doctorStartTime AND doctorEndTime) OR
+        (doctorStartTime > doctorEndTime AND (CURTIME() >= doctorStartTime OR CURTIME() < doctorEndTime)),
+        'On Duty',
+        'Off Duty'
+      ) AS dutyStatus
+    FROM doctor
+    WHERE doctorStatus = "L"
+  `);
+  return rows;
+}
+
+export async function getActiveDoctorsOnDutyTotal() {
+  const [rows] = await pool.query(`
+    SELECT COUNT(*) AS total
+    FROM doctor
+    WHERE
+      doctorStatus = "A" AND
+      (doctorStartTime < doctorEndTime AND CURTIME() BETWEEN doctorStartTime AND doctorEndTime) OR
+      (doctorStartTime > doctorEndTime AND (CURTIME() >= doctorStartTime OR CURTIME() < doctorEndTime))
+  `);
+  return rows[0];
+}
+
+export async function getActiveDoctorsOffDutyTotal() {
+  const [rows] = await pool.query(`
+    SELECT COUNT(*) AS total
+    FROM doctor
+    WHERE 
+      doctorStatus = "A" AND
+      NOT (
+      (doctorStartTime < doctorEndTime AND CURTIME() BETWEEN doctorStartTime AND doctorEndTime) OR
+      (doctorStartTime > doctorEndTime AND (CURTIME() >= doctorStartTime OR CURTIME() < doctorEndTime))
+    )
+  `);
+  return rows[0];
+}
+
+export async function getActiveDoctorsTotal() {
+  const [rows] = await pool.query(`
+    SELECT COUNT(*) AS total
+    FROM doctor
+    WHERE doctorStatus = "A"
+  `);
+  return rows[0];
+}
+
+export async function getInactiveDoctorsTotal() {
+  const [rows] = await pool.query(`
+    SELECT COUNT(*) AS total
+    FROM doctor
+    WHERE doctorStatus = "I"
+  `);
+  return rows[0];
+}
+
+export async function getDoctorsOnLeaveTotal() {
+  const [rows] = await pool.query(`
+    SELECT COUNT(*) AS total
+    FROM doctor
+    WHERE doctorStatus = "L"
+  `);
   return rows[0];
 }
 
@@ -289,14 +425,15 @@ export async function createDoctor(
   doctorName,
   doctorStartTime,
   doctorEndTime,
+  doctorStatus,
   doctorPassword
 ) {
   await pool.query(
     `
-    INSERT INTO doctor (doctorName, doctorStartTime, doctorEndTime, doctorPassword)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO doctor (doctorName, doctorStartTime, doctorEndTime, doctorStatus, doctorPassword)
+    VALUES (?, ?, ?, ?, ?)
   `,
-    [doctorName, doctorStartTime, doctorEndTime, doctorPassword]
+    [doctorName, doctorStartTime, doctorEndTime, doctorStatus, doctorPassword]
   );
 }
 
@@ -391,18 +528,19 @@ export async function updateAdmissionDoctor(admissionID, doctorID) {
   );
 }
 
-export async function updateDoctorShift(
+export async function updateDoctorDetails(
   doctorID,
   doctorStartTime,
-  doctorEndtime
+  doctorEndtime,
+  doctorStatus
 ) {
   await pool.query(
     `
     UPDATE doctor
-    SET doctorStartTime = ?, doctorEndTime = ?
+    SET doctorStartTime = ?, doctorEndTime = ?, doctorStatus = ?
     WHERE doctorID = ? 
   `,
-    [doctorStartTime, doctorEndtime, doctorID]
+    [doctorStartTime, doctorEndtime, doctorStatus, doctorID]
   );
 }
 
