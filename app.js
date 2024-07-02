@@ -5,6 +5,7 @@ import doctorRouter from "./routers/doctor.js";
 import visitorRouter from "./routers/visitor.js";
 import admissionRouter from "./routers/admission.js";
 import adminRouter from "./routers/admin.js";
+import problemRouter from "./routers/problem.js";
 
 const app = express();
 const PORT = 8080;
@@ -17,6 +18,7 @@ app.use("/api/doctor", doctorRouter);
 app.use("/api/visitor", visitorRouter);
 app.use("/api/admission", admissionRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/problem", problemRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

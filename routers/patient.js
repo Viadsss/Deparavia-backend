@@ -7,7 +7,7 @@ import {
   getPatientVisitors,
   getPatientAdmissionsTotal,
   getPatientVisitorsTotal,
-} from "../database.js";
+} from "../database/database.js";
 import bcrypt from "bcrypt";
 
 const patientRouter = Router();

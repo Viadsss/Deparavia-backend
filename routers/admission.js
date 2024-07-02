@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { format } from "date-fns";
 import bcrypt from "bcrypt";
-import { createAdmission, createPatient, getPatient } from "../database.js";
+import {
+  createAdmission,
+  createPatient,
+  getPatient,
+} from "../database/database.js";
 
 const admissionRouter = Router();
 

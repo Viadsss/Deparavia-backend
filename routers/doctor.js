@@ -6,7 +6,7 @@ import {
   updatePatientDiagnosis,
   updatePatientDischarge,
   updatePatientProcedure,
-} from "../database.js";
+} from "../database/database.js";
 import bcrypt from "bcrypt";
 
 const doctorRouter = Router();

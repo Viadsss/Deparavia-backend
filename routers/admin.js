@@ -37,7 +37,7 @@ import {
   getActiveDoctorsTotal,
   getInactiveDoctorsTotal,
   getDoctorsOnLeaveTotal,
-} from "../database.js";
+} from "../database/database.js";
 
 const adminRouter = Router();
 
