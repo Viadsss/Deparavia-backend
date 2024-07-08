@@ -24,7 +24,7 @@ export async function getAdmissionsNoDoctor() {
   const [rows] = await pool.query(`
     SELECT * FROM admission
     WHERE doctorID IS NULL
-    ORDER BY admissionDate DESC
+    ORDER BY admissionDate ASC
   `);
   return rows;
 }

@@ -38,7 +38,7 @@ export async function getProblem3() {
 
 // Moderate
 // Problem 4
-// Display the marital statuses of patients  where there are more than 5 patients associated with each status.
+// Display the marital statuses with more than 5 patients, along with the number of patients for each status.
 export async function getProblem4() {
   const [rows] = await pool.query(`
     SELECT maritalStatus, COUNT(*) as patientCount
@@ -51,7 +51,7 @@ export async function getProblem4() {
 }
 
 // Problem 5
-// Display the visitor relationships where there are more than 3 visits in each category.
+// Display the visitor relationships and its total visits where there are more than 3 visits in each category.
 export async function getProblem5() {
   const [rows] = await pool.query(`
     SELECT visitorRelationship, COUNT(*) as visitorCount
@@ -92,21 +92,22 @@ export async function getProblem7() {
 
 // Difficult
 // Problem 8
-// Display the visitor's name of female patients, including their total visit, only include the visitors that visits more than 3 visits.
+// Display the visitor's name of female patients, including their total visit in descending order, only include the visitors that have more than 2 visits.
 export async function getProblem8() {
   const [rows] = await pool.query(`
     SELECT v.visitorName, COUNT(*) AS total_visits
     FROM visitor v, patient p
     WHERE p.patientID = v.patientID AND p.sex = 'F'
     GROUP BY v.visitorName
-    HAVING total_visits > 3
+    HAVING total_visits > 2
+    ORDER BY total_visits DESC
   `);
 
   return rows;
 }
 
 // Problem 9
-// Display the patients' names, the total number of their admissions, and the most recent admission date. Only include patients who have been admitted more than twice.
+// Display the patients' ID and their names, the total number of their admissions, and the most recent admission date. Only include patients who have been admitted more than once and sort them in descending order.
 export async function getProblem9() {
   const [rows] = await pool.query(`
     SELECT
@@ -115,7 +116,7 @@ export async function getProblem9() {
     FROM patient p, admission a
     WHERE  p.patientID = a.patientID
     GROUP BY p.patientID, p.firstName, p.lastName
-    HAVING COUNT(a.admissionID) > 2
+    HAVING COUNT(a.admissionID) > 1
     ORDER BY total_admissions DESC
   `);
 
@@ -123,14 +124,14 @@ export async function getProblem9() {
 }
 
 // Problem 10
-// Retrieve the doctor names and the average number of days their patients stay admitted, only for doctors with an average stay duration greater than 5 days.
+// Retrieve the doctors'ID and their respective names and the average number of days their patients stay admitted, only for doctors with an average stay duration greater than 1 and a half days.
 export async function getProblem10() {
   const [rows] = await pool.query(`
     SELECT d.doctorName, AVG(DATEDIFF(a.dischargeDate, a.admissionDate)) AS avgStayDuration
     FROM doctor d, admission a
     WHERE d.doctorID = a.doctorID AND a.dischargeDate IS NOT NULL
     GROUP BY d.doctorID, d.doctorName
-    HAVING avgStayDuration > 5
+    HAVING avgStayDuration > 1.5
   `);
 
   return rows;
