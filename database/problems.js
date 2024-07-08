@@ -127,7 +127,7 @@ export async function getProblem9() {
 // Retrieve the doctors'ID and their respective names and the average number of days their patients stay admitted, only for doctors with an average stay duration greater than 1 and a half days.
 export async function getProblem10() {
   const [rows] = await pool.query(`
-    SELECT d.doctorName, AVG(DATEDIFF(a.dischargeDate, a.admissionDate)) AS avgStayDuration
+    SELECT d.doctorID, d.doctorName, AVG(DATEDIFF(a.dischargeDate, a.admissionDate)) AS avgStayDuration
     FROM doctor d, admission a
     WHERE d.doctorID = a.doctorID AND a.dischargeDate IS NOT NULL
     GROUP BY d.doctorID, d.doctorName
